@@ -19,19 +19,21 @@ type CheckoutIntf interface {
 }
 
 type Shopper struct {
-	Store []Store
+	Store Store
 	mu    sync.Mutex
 }
 
 func NewShopper() *Shopper {
 	return &Shopper{
-		Store: []Store{},
+		Store: Store{},
 		mu:    sync.Mutex{},
 	}
 }
 
 func (s *Shopper) ScanItem(sku string) {
-
+	s.mu.Lock()
+	s.Store = append(s.Store, ItemDetails{SKU: sku})
+	s.mu.Unlock()
 }
 
 func (s *Shopper) GetTotal() int64 {
