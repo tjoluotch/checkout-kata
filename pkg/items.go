@@ -13,6 +13,8 @@ type Offer map[int]int64
 
 type Store []ItemDetails
 
+type PriceList map[string]int64
+
 type CheckoutIntf interface {
 	ScanItem(sku string)
 	GetTotal() int64
@@ -21,12 +23,14 @@ type CheckoutIntf interface {
 type Shopper struct {
 	Store Store
 	mu    sync.Mutex
+	PList PriceList
 }
 
-func NewShopper() *Shopper {
+func NewShopper() CheckoutIntf {
 	return &Shopper{
 		Store: Store{},
 		mu:    sync.Mutex{},
+		PList: getPriceList(),
 	}
 }
 
@@ -38,4 +42,13 @@ func (s *Shopper) ScanItem(sku string) {
 
 func (s *Shopper) GetTotal() int64 {
 	return 0
+}
+
+func getPriceList() PriceList {
+	return map[string]int64{
+		"A": 50,
+		"B": 30,
+		"C": 20,
+		"D": 15,
+	}
 }
