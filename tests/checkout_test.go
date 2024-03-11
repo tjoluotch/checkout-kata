@@ -18,6 +18,23 @@ func TestCheckout(t *testing.T) {
 		}
 	})
 
+	t.Run("scan item and get correct total", func(t *testing.T) {
+		checkout := pkg.NewShopper()
+		checkout.ScanItem("B")
+
+		sh := getConcreteTypeShopper(t, checkout)
+
+		if len(sh.Store) != 1 {
+			t.Error("failed to scan item")
+		}
+
+		expect := int64(30)
+		total := checkout.GetTotal()
+		if total != expect {
+			t.Errorf("failed to get the expected value, wanted %v gotten %v\n", expect, total)
+		}
+	})
+
 	t.Run("test adding single item to checkout", func(t *testing.T) {
 		//s := new(pkg.Shopper)
 	})
