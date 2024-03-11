@@ -23,6 +23,13 @@ type Shopper struct {
 	mu    sync.Mutex
 }
 
+func NewShopper() *Shopper {
+	return &Shopper{
+		Store: []Store{},
+		mu:    sync.Mutex{},
+	}
+}
+
 func (s *Shopper) ScanItem(sku string) {
 
 }
