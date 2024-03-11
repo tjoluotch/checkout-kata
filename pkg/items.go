@@ -51,7 +51,7 @@ func (s *Shopper) ScanItem(sku string) error {
 	}
 	// error reporting if sku not found in price list
 	if found == "" {
-		errors.New(fmt.Sprintf("the given SKU %s is not in the store's price list, try again", sku))
+		return errors.New(fmt.Sprintf("the given SKU %s is not in the store's price list, try again", sku))
 	}
 
 	// get unit price of sku
