@@ -10,14 +10,18 @@ type ItemDetails struct {
 	SKU          string
 	UnitPrice    int64
 	SpecialOffer Offer
-	//Quantity     int
 }
 
-type Offer map[int]int64
+type Offer map[string]string
 
 type Store []ItemDetails
 
 type PriceList map[string]int64
+
+type PriceEngine struct {
+	PList        PriceList
+	SpecialOffer Offer
+}
 
 type CheckoutIntf interface {
 	ScanItem(sku string) error
@@ -25,23 +29,31 @@ type CheckoutIntf interface {
 }
 
 type Shopper struct {
-	Store Store
-	mu    sync.Mutex
-	PList PriceList
+	Store   Store
+	mu      sync.Mutex
+	PEngine PriceEngine
 }
 
-func NewShopper() CheckoutIntf {
+func NewPriceEngine(specialOffer Offer, priceList PriceList) PriceEngine {
+	return PriceEngine{
+		PList:        priceList,
+		SpecialOffer: specialOffer,
+	}
+}
+
+func NewShopper(pe PriceEngine) CheckoutIntf {
+
 	return &Shopper{
-		Store: Store{},
-		mu:    sync.Mutex{},
-		PList: getPriceList(),
+		Store:   Store{},
+		mu:      sync.Mutex{},
+		PEngine: pe,
 	}
 }
 
 func (s *Shopper) ScanItem(sku string) error {
 	// check sku is in priceList
 	var found string
-	for key, _ := range s.PList {
+	for key, _ := range s.PEngine.PList {
 		if key != sku {
 			continue
 		} else {
@@ -55,7 +67,7 @@ func (s *Shopper) ScanItem(sku string) error {
 	}
 
 	// get unit price of sku
-	price := s.PList[found]
+	price := s.PEngine.PList[found]
 
 	s.mu.Lock()
 	s.Store = append(s.Store, ItemDetails{SKU: found, UnitPrice: price})
@@ -84,4 +96,15 @@ func getPriceList() PriceList {
 		"C": 20,
 		"D": 15,
 	}
+}
+
+func getSpecialOffers() Offer {
+	return map[string]string{
+		"A": "3x130",
+		"B": "2x45",
+	}
+}
+
+func GetDefaultPriceOffers() (Offer, PriceList) {
+	return getSpecialOffers(), getPriceList()
 }
