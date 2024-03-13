@@ -22,3 +22,9 @@ interface ICheckout
     int GetTotalPrice();
 }
 ```
+
+## Code
+
+all of the code for the checkout system is located in the `pkg` directory with test suite in `tests` directory. 
+
+`main.go` contains an implementation of the checkout system created to use and experiment with. 
