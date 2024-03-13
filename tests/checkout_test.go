@@ -11,7 +11,8 @@ var ()
 func TestCheckout(t *testing.T) {
 
 	t.Run("scan Item", func(t *testing.T) {
-		checkout := pkg.NewShopper()
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 		_ = checkout.ScanItem("A")
 
 		sh := getConcreteTypeShopper(t, checkout)
@@ -23,7 +24,8 @@ func TestCheckout(t *testing.T) {
 
 	t.Run("scan item that isn't in price list, error expected", func(t *testing.T) {
 		scannedItem := "A33"
-		checkout := pkg.NewShopper()
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 		err := checkout.ScanItem(scannedItem)
 
 		// if error returned is nil
@@ -33,7 +35,8 @@ func TestCheckout(t *testing.T) {
 	})
 
 	t.Run("scan item and get correct total", func(t *testing.T) {
-		checkout := pkg.NewShopper()
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 		_ = checkout.ScanItem("B")
 
 		sh := getConcreteTypeShopper(t, checkout)
@@ -50,7 +53,8 @@ func TestCheckout(t *testing.T) {
 	})
 
 	t.Run("scan 1 of A..D items and get correct total", func(t *testing.T) {
-		checkout := pkg.NewShopper()
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 		_ = checkout.ScanItem("A")
 		_ = checkout.ScanItem("B")
 		_ = checkout.ScanItem("C")
@@ -64,7 +68,8 @@ func TestCheckout(t *testing.T) {
 	})
 
 	t.Run("scan B, A, B items and get correct total", func(t *testing.T) {
-		checkout := pkg.NewShopper()
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 		_ = checkout.ScanItem("B")
 		_ = checkout.ScanItem("A")
 		_ = checkout.ScanItem("B")
