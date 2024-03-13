@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode"
 )
 
 // Offer represent a mapping of the SKU and the particular offer given in a string format
@@ -59,6 +60,14 @@ func NewShopper(pe PriceEngine) CheckoutIntf {
 
 // ScanItem scans an SKU and reports any errors
 func (s *Shopper) ScanItem(sku string) error {
+	// validate format of scanned item stock keeping unit string passed
+	checkStr := []rune(sku)
+	for _, val := range checkStr {
+		if !unicode.IsUpper(val) {
+			return errors.New("incorrect item stock keeping unit, SKU should only be uppercase letter(s)")
+		}
+	}
+
 	// check sku is in priceList
 	var found string
 	for key, _ := range s.PEngine.PList {
