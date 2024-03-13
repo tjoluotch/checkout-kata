@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-var ()
-
 func TestCheckout(t *testing.T) {
 
 	t.Run("scan Item", func(t *testing.T) {
