@@ -8,11 +8,6 @@ import (
 	"sync"
 )
 
-type ItemDetails struct {
-	SKU       string
-	UnitPrice int64
-}
-
 type Offer map[string]string
 
 type Store map[string]int
