@@ -3,13 +3,14 @@ package pkg
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 )
 
 type ItemDetails struct {
-	SKU          string
-	UnitPrice    int64
-	SpecialOffer Offer
+	SKU       string
+	UnitPrice int64
 }
 
 type Offer map[string]string
@@ -87,6 +88,48 @@ func (s *Shopper) GetTotal() int64 {
 		total += item.UnitPrice
 	}
 	return total
+}
+
+func (s *Shopper) checkSpecialOffer(qt map[string]int) int64 {
+	final := int64(0)
+
+	for key, amount := range qt {
+		// no special offer to check and possibly apply so simply add unit price
+		if amount == 1 {
+			s.PEngine.PList[key] += final
+			continue
+		}
+
+		quantityOffer, offerPrice := decodeSpecialOffer(s.PEngine.SpecialOffer[key])
+		mod := amount % quantityOffer
+		if mod == 0 {
+			apply := amount / quantityOffer
+			temp := int64(apply * offerPrice)
+			temp += final
+			continue
+		} else {
+			// remainder after special offer - so apply regular unit price
+			partA := int64(mod) * s.PEngine.PList[key]
+
+			// applied offer
+			spOfferMultiplier := amount - mod
+			spOfferMultiplier = spOfferMultiplier / quantityOffer
+			partB := int64(spOfferMultiplier * offerPrice)
+
+			total := partA + partB
+			total += final
+			continue
+		}
+	}
+
+	return final
+}
+
+func decodeSpecialOffer(offer string) (quantity, offerPrice int) {
+	results := strings.Split(offer, "x")
+	quantity, _ = strconv.Atoi(results[0])
+	offerPrice, _ = strconv.Atoi(results[1])
+	return
 }
 
 func getPriceList() PriceList {
