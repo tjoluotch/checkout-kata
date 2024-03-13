@@ -81,6 +81,36 @@ func TestCheckout(t *testing.T) {
 		}
 	})
 
+	t.Run("scan 8A's, 1D, and 5B's in a random order and get correct total", func(t *testing.T) {
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
+		// test case demonstrates correct amount of offers applied with remaining items calculated at unit price
+		_ = checkout.ScanItem("B")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("D")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("B")
+		_ = checkout.ScanItem("B")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("B")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("A")
+		_ = checkout.ScanItem("B")
+		_ = checkout.ScanItem("A")
+
+		expect := int64(495)
+		total := checkout.GetTotal()
+		if total != expect {
+			t.Errorf("failed to get the expected value, wanted %v gotten %v\n", expect, total)
+		}
+	})
+
+	t.Run("no items scanned, total should be 0", func(t *testing.T) {
+
+	})
+
 }
 
 func getConcreteTypeShopper(t testing.TB, checkout pkg.CheckoutIntf) (concrete *pkg.Shopper) {
