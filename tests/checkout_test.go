@@ -125,7 +125,7 @@ func TestCheckout(t *testing.T) {
 	t.Run("scanned with incorrect format 'a$y', expect error", func(t *testing.T) {
 		specialOffer, priceList := pkg.GetDefaultPriceOffers()
 		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
-		err := checkout.ScanItem("a$y")
+		err := checkout.ScanItem("A$y")
 
 		if err == nil {
 			t.Errorf("expected error as attempted scan is is incorrect format: %v", err)
