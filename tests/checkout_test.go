@@ -126,6 +126,7 @@ func TestCheckout(t *testing.T) {
 
 }
 
+// getConcreteTypeShopper gets the concrete type *shopper of the checkout interface. This is a test helper
 func getConcreteTypeShopper(t testing.TB, checkout pkg.CheckoutIntf) (concrete *pkg.Shopper) {
 	t.Helper()
 	concrete, ok := checkout.(*pkg.Shopper)
