@@ -122,6 +122,16 @@ func TestCheckout(t *testing.T) {
 		}
 	})
 
+	t.Run("scanned with incorrect format 'a$y', expect error", func(t *testing.T) {
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
+		err := checkout.ScanItem("a$y")
+
+		if err == nil {
+			t.Errorf("expected error as attempted scan is is incorrect format: %v", err)
+		}
+	})
+
 }
 
 // getConcreteTypeShopper gets the concrete type *shopper of the checkout interface. This is a test helper
