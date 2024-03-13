@@ -15,7 +15,7 @@ type ItemDetails struct {
 
 type Offer map[string]string
 
-type Store []ItemDetails
+type Store map[string]int
 
 type PriceList map[string]int64
 
@@ -67,11 +67,8 @@ func (s *Shopper) ScanItem(sku string) error {
 		return errors.New(fmt.Sprintf("the given SKU %s is not in the store's price list, try again", sku))
 	}
 
-	// get unit price of sku
-	price := s.PEngine.PList[found]
-
 	s.mu.Lock()
-	s.Store = append(s.Store, ItemDetails{SKU: found, UnitPrice: price})
+	s.Store[found] += 1
 	s.mu.Unlock()
 
 	return nil
@@ -84,19 +81,24 @@ func (s *Shopper) GetTotal() int64 {
 		return 0
 	}
 
-	for _, item := range s.Store {
-		total += item.UnitPrice
-	}
+	total = s.calculateCheckout()
 	return total
 }
 
-func (s *Shopper) checkSpecialOffer(qt map[string]int) int64 {
+// calculateCheckout calculates the total value of the items in the checkout given both unit prices and special offer
+// prices returning back the final amount.
+func (s *Shopper) calculateCheckout() int64 {
 	final := int64(0)
 
-	for key, amount := range qt {
-		// no special offer to check and possibly apply so simply add unit price
+	for key, amount := range s.Store {
+		// singular item, simply add unit price
 		if amount == 1 {
-			s.PEngine.PList[key] += final
+			final += s.PEngine.PList[key]
+			continue
+		}
+
+		// no special offer to check and possibly apply so next iteration
+		if s.PEngine.SpecialOffer[key] == "" {
 			continue
 		}
 
@@ -105,7 +107,7 @@ func (s *Shopper) checkSpecialOffer(qt map[string]int) int64 {
 		if mod == 0 {
 			apply := amount / quantityOffer
 			temp := int64(apply * offerPrice)
-			temp += final
+			final += temp
 			continue
 		} else {
 			// remainder after special offer - so apply regular unit price
@@ -117,7 +119,7 @@ func (s *Shopper) checkSpecialOffer(qt map[string]int) int64 {
 			partB := int64(spOfferMultiplier * offerPrice)
 
 			total := partA + partB
-			total += final
+			final += total
 			continue
 		}
 	}
