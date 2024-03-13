@@ -107,8 +107,21 @@ func TestCheckout(t *testing.T) {
 		}
 	})
 
-	t.Run("no items scanned, total should be 0", func(t *testing.T) {
+	t.Run("no items scanned, total should be 0, store should be empty", func(t *testing.T) {
+		specialOffer, priceList := pkg.GetDefaultPriceOffers()
+		checkout := pkg.NewShopper(pkg.NewPriceEngine(specialOffer, priceList))
 
+		sh := getConcreteTypeShopper(t, checkout)
+
+		if len(sh.Store) != 0 {
+			t.Error("failed, store should not have any items")
+		}
+
+		expect := int64(0)
+		total := checkout.GetTotal()
+		if total != expect {
+			t.Errorf("failed to get the expected value, wanted %v gotten %v\n", expect, total)
+		}
 	})
 
 }
